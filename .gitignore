@@ -1,0 +1,36 @@
+# Dipendenze
+node_modules
+
+# Next.js build output (IMPORTANTE)
+.next
+out
+build
+dist
+
+# Hardhat
+artifacts
+cache
+typechain
+typechain-types
+backend/constants
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Security
+backend/keys/rsa_private.pem
+backend/keys/rsa_public.pem
+
+# OS junk
+.DS_Store
+Thumbs.db
+output_test/contracts_tests.txt
+output_test/scripts_tests.txt
+output_test/unit_tests.txt
+output_test/*
+
+# Chiavi temporanee di test
+backend/temp_test_key.pem
+keys/*

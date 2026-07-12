@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "db": {
+            "Name": "Mio Database Docker",
+            "Group": "Servers",
+            "Host": "db",
+            "Port": 5432,
+            "MaintenanceDB": "mydatabase",
+            "Username": "myuser",
+            "SSLMode": "prefer"
+        }
+    }
+}

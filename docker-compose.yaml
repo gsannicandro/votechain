@@ -1,0 +1,122 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-gui
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  
+      PGADMIN_DEFAULT_PASSWORD: admin       
+    ports:
+      - "5050:80"
+    networks:
+      - app-network
+    volumes:
+      - ./db-init/servers.json:/pgadmin4/servers.json
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog-service
+    restart: always
+    ports:
+      - "8025:8025"   # Interfaccia web
+      - "1025:1025"   # SMTP
+    networks:
+      - app-network
+
+  blockchain-1:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: hardhat-chain-1
+    command: npx hardhat node --hostname 0.0.0.0 --port 8545
+    ports:
+      - "8545:8545"
+    networks:
+      - app-network
+    volumes:
+      - ./hardhat.config.js:/app/hardhat.config.js
+      - ./backend:/app/backend
+      - ./scripts:/app/scripts
+      - ./contracts:/app/contracts
+      - ./artifacts:/app/artifacts
+
+  blockchain-2:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: hardhat-chain-2
+    command: npx hardhat node --hostname 0.0.0.0 --port 8546
+    ports:
+      - "8546:8546"
+    networks:
+      - app-network
+    volumes:
+      - ./hardhat.config.js:/app/hardhat.config.js
+      - ./backend:/app/backend
+      - ./scripts:/app/scripts
+      - ./contracts:/app/contracts
+      - ./artifacts:/app/artifacts
+
+  backend:
+    build: ./backend
+    container_name: next-backend
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgres://myuser:mypassword@db:5432/mydatabase
+      RPC_URL_1: http://blockchain-1:8545
+      RPC_URL_2: http://blockchain-2:8546
+      EMAIL_HOST: mailhog-service
+      EMAIL_PORT: 1025
+      JWT_SECRET: super-secret-dev-key
+      JWT_EXPIRES_IN: 2h
+      CORS_ORIGIN: http://localhost:3000
+      ADMIN_PRIVATE_KEY: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    depends_on:
+      - db
+      - blockchain-1
+      - blockchain-2
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./artifacts:/app/artifacts
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    container_name: next-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      SERVER_API_URL: http://backend:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

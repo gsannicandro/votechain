@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "big-integer": "^1.6.52",
+    "blind-signatures": "^1.0.7",
+    "dotenv": "^17.2.3",
+    "ethers": "^6.15.0",
+    "joi": "^18.0.2",
+    "jsbn": "^1.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "keccak256": "^1.0.6",
+    "merkletreejs": "^0.6.0",
+    "next": "^14.2.33",
+    "node-rsa": "^1.1.1",
+    "nodemailer": "^7.0.12",
+    "pg": "^8.16.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "secure-random": "^1.1.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "node-mocks-http": "^1.17.2"
+  }
+}
